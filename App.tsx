@@ -25,6 +25,7 @@ import type { Task } from './database';
 export default function App() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [taskText, setTaskText] = useState('');
+  const [searchText, setSearchText] = useState('');
   const [editingTaskId, setEditingTaskId] = useState<number | null>(null);
 
   useEffect(() => {
@@ -76,6 +77,9 @@ export default function App() {
   }
 
   const isEditing = editingTaskId !== null;
+  const filteredTasks = tasks.filter((task) =>
+    task.title.toLowerCase().includes(searchText.trim().toLowerCase())
+  );
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -111,21 +115,41 @@ export default function App() {
           )}
         </View>
 
+        <View style={styles.searchArea}>
+          <TextInput
+            value={searchText}
+            onChangeText={setSearchText}
+            placeholder="Filtrar tarefas"
+            placeholderTextColor="#7d8b99"
+            style={styles.input}
+          />
+        </View>
+
         <FlatList
-          data={tasks}
+          data={filteredTasks}
           keyExtractor={(item) => String(item.id)}
-          contentContainerStyle={tasks.length === 0 ? styles.emptyList : styles.list}
-          ListEmptyComponent={<Text style={styles.emptyText}>Nenhuma tarefa cadastrada.</Text>}
+          contentContainerStyle={filteredTasks.length === 0 ? styles.emptyList : styles.list}
+          ListEmptyComponent={
+            <Text style={styles.emptyText}>
+              {tasks.length === 0 ? 'Nenhuma tarefa cadastrada.' : 'Nenhuma tarefa encontrada.'}
+            </Text>
+          }
           renderItem={({ item }) => (
             <View style={styles.taskItem}>
-              <Pressable style={styles.taskContent} onPress={() => handleEditTask(item)}>
+              <View style={styles.taskContent}>
                 <Text style={styles.taskTitle}>{item.title}</Text>
-                <Text style={styles.taskDate}>Toque para editar</Text>
-              </Pressable>
+                <Text style={styles.taskDate}>Criada em ordem de cadastro</Text>
+              </View>
 
-              <Pressable style={styles.deleteButton} onPress={() => handleDeleteTask(item.id)}>
-                <Text style={styles.deleteButtonText}>Excluir</Text>
-              </Pressable>
+              <View style={styles.taskActions}>
+                <Pressable style={styles.editButton} onPress={() => handleEditTask(item)}>
+                  <Text style={styles.actionButtonText}>Editar</Text>
+                </Pressable>
+
+                <Pressable style={styles.deleteButton} onPress={() => handleDeleteTask(item.id)}>
+                  <Text style={styles.actionButtonText}>Excluir</Text>
+                </Pressable>
+              </View>
             </View>
           )}
         />
@@ -164,6 +188,13 @@ const styles = StyleSheet.create({
     borderBottomColor: '#d9e1ea',
     borderBottomWidth: 1,
     padding: 18,
+  },
+  searchArea: {
+    backgroundColor: '#eef3f8',
+    borderBottomColor: '#d9e1ea',
+    borderBottomWidth: 1,
+    paddingHorizontal: 18,
+    paddingVertical: 14,
   },
   input: {
     backgroundColor: '#f0f4f8',
@@ -225,6 +256,10 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingRight: 12,
   },
+  taskActions: {
+    flexDirection: 'row',
+    gap: 8,
+  },
   taskTitle: {
     color: '#172536',
     fontSize: 16,
@@ -235,13 +270,19 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginTop: 4,
   },
+  editButton: {
+    backgroundColor: '#1f5f8b',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 9,
+  },
   deleteButton: {
     backgroundColor: '#b42318',
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 9,
   },
-  deleteButtonText: {
+  actionButtonText: {
     color: '#ffffff',
     fontSize: 13,
     fontWeight: '700',

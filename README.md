@@ -6,8 +6,9 @@ Aplicativo mobile de lista de tarefas criado com React Native, Expo e SQLite.
 
 - Adicionar tarefas
 - Listar tarefas em ordem de criacao
-- Editar tarefas ao tocar em uma tarefa da lista
+- Editar tarefas pelo botao `Editar`
 - Excluir tarefas
+- Filtrar tarefas digitando no campo de busca
 - Persistir os dados entre sessoes usando banco SQLite local
 
 ## Banco de dados
