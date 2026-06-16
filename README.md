@@ -12,7 +12,9 @@ Aplicativo mobile de lista de tarefas criado com React Native, Expo e SQLite.
 
 ## Banco de dados
 
-O projeto usa `expo-sqlite`, que cria um banco SQLite local no dispositivo ou emulador.
+No Android, o projeto usa `expo-sqlite`, que cria um banco SQLite local no dispositivo ou emulador.
+
+Para facilitar testes pelo navegador com a tecla `w` do Expo, a versao web usa `localStorage` como armazenamento local persistente.
 
 A tabela principal e `tasks`, com os campos:
 
@@ -34,8 +36,12 @@ Inicie o Expo:
 npx expo start
 ```
 
-Depois, abra no celular com o aplicativo Expo Go ou rode em um emulador Android.
+Depois, pressione:
+
+- `w` para abrir no navegador
+- `a` para abrir em um emulador Android
+- ou escaneie o QR Code com o Expo Go
 
 ## Observacao
 
-Ao fechar e abrir o app novamente, as tarefas continuam salvas porque ficam armazenadas no SQLite.
+Ao fechar e abrir o app novamente, as tarefas continuam salvas no armazenamento local da plataforma usada.

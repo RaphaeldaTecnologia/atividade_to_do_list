@@ -1,5 +1,4 @@
 import { StatusBar } from 'expo-status-bar';
-import * as SQLite from 'expo-sqlite';
 import { useEffect, useState } from 'react';
 import {
   Alert,
@@ -14,14 +13,14 @@ import {
   TextInput,
   View,
 } from 'react-native';
-
-type Task = {
-  id: number;
-  title: string;
-  created_at: string;
-};
-
-const db = SQLite.openDatabaseSync('todo-list.db');
+import {
+  addTask,
+  deleteTask,
+  initializeDatabase,
+  listTasks,
+  updateTask,
+} from './database';
+import type { Task } from './database';
 
 export default function App() {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -33,22 +32,8 @@ export default function App() {
     loadTasks();
   }, []);
 
-  function initializeDatabase() {
-    db.execSync(`
-      CREATE TABLE IF NOT EXISTS tasks (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        title TEXT NOT NULL,
-        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-      );
-    `);
-  }
-
   function loadTasks() {
-    const savedTasks = db.getAllSync<Task>(
-      'SELECT id, title, created_at FROM tasks ORDER BY datetime(created_at) ASC, id ASC;'
-    );
-
-    setTasks(savedTasks);
+    setTasks(listTasks());
   }
 
   function clearForm() {
@@ -66,12 +51,9 @@ export default function App() {
     }
 
     if (editingTaskId) {
-      db.runSync('UPDATE tasks SET title = ? WHERE id = ?;', [title, editingTaskId]);
+      updateTask(editingTaskId, title);
     } else {
-      db.runSync('INSERT INTO tasks (title, created_at) VALUES (?, ?);', [
-        title,
-        new Date().toISOString(),
-      ]);
+      addTask(title);
     }
 
     clearForm();
@@ -84,7 +66,7 @@ export default function App() {
   }
 
   function handleDeleteTask(id: number) {
-    db.runSync('DELETE FROM tasks WHERE id = ?;', [id]);
+    deleteTask(id);
 
     if (editingTaskId === id) {
       clearForm();
